@@ -117,11 +117,14 @@ $$
 
 $$
 v_k=a_kv_{k-1}+b_ku_{k}^{i}
-\tag{6}
+\tag{7}
 $$
 
-对其展开，则构成以下形式
+为计算所有的 $v_0, v_1, \ldots, v_L$ 从而实现SSM，最直接的方式就是从初始值 $v_0$ 开始迭代，利用公式（7）串行的循环计算，但这样计算效率不高，由此引出以下的并行计算过程。
 
+## Mamba SSM并行计算
+
+对公式（7）展开，则构成以下形式
 $$
 \begin{aligned}
 	v_k&=a_kv_{k-1}+b_ku_{k}^{i}\\
@@ -130,12 +133,10 @@ $$
 	&\vdots\\
 	&=a_ka_{k-1}\cdots a_1v_0+\sum_{j=1}^k{\left( \prod_{m=j+1}^k{a_m} \right)}b_ju_{j}^{i}\\
 \end{aligned}
-\tag{7}
+\tag{8}
 $$
 
-## Mamba SSM并行计算
-
-公式（7）虽然复杂，但实际上主要有三个类型的变量，包括 
+公式（8）虽然复杂，但实际上主要有三个类型的变量，包括 
 
 $$
 \begin{aligned}
@@ -145,13 +146,14 @@ $$
 \end{aligned}
 $$
 
-公式（7）简化为
+因此，公式（8）简化为
 
 $$
 v_k = a_{k\ldots 0} + \sum_{j=1}^k a_{k\ldots j+1} c_j
+\tag{9}
 $$
 
-启发构造以下的算子（ **由Mamba的CUDA代码反推** ）：
+由此启发构造以下算子（ **由Mamba的CUDA代码反推** ）：
 
 $$
 \begin{aligned}
@@ -168,7 +170,7 @@ $$
 	a_k v_{k-1}+ c_k\\
 \end{array} \right]\\
 \end{aligned}
-\tag{8}
+\tag{10}
 $$
 
 不难证明这个算子 $\oplus $ 满足结合律：
@@ -239,6 +241,87 @@ $$
 \end{aligned}
 $$
 
+进一步简化符号，定义
+
+$$
+\begin{aligned}
+& s_k=\left[ \begin{array}{c}
+	a_k\\
+	v_k\\
+\end{array} \right] 
+, e_k=\left[ \begin{array}{c}
+	a_k\\
+	c_k\\
+\end{array} \right] 
+\end{aligned}
+$$
+
+并且根据公式（7），有如下递推过程：
+
+$$
+\begin{aligned}
+	&s_{k-1}\oplus e_k=\left[ \begin{array}{c}
+	a_ka_{k-1}\\
+	a_kv_{k-1}+c_k\\
+\end{array} \right] =\left[ \begin{array}{c}
+	a_ka_{k-1}\\
+	v_k\\
+\end{array} \right]\\
+	&s_{k-2}\oplus e_{k-1}\oplus e_k=\left[ \begin{array}{c}
+	a_{k-1}a_{k-2}\\
+	v_{k-1}\\
+\end{array} \right] \oplus e_k=\left[ \begin{array}{c}
+	a_ka_{k-1}a_{k-2}\\
+	v_k\\
+\end{array} \right]\\
+	&\vdots\\
+	&s_0\oplus e_1\oplus \cdots \oplus e_k=\left[ \begin{array}{c}
+	a_ka_{k-1}\cdots a_0\\
+	v_k\\
+\end{array} \right]\\
+\end{aligned}
+$$
+
+根据算子 $\oplus$ 的结合律，可得
+
+$$
+\begin{aligned}
+	\left[ \begin{array}{c}
+	a_ka_{k-1}\cdots a_0\\
+	v_k\\
+\end{array} \right] &=\left( \cdots \left( \left( s_0\oplus e_1 \right) \oplus e_2 \right) \cdots \oplus e_k \right)\\
+	&=s_0\oplus \left( e_1\oplus \cdots \oplus e_n \right) \oplus \left( e_{n+1}\oplus \cdots \oplus e_k \right)\\
+\end{aligned}
+\tag{11}
+$$
+
+这意味着可以把原本 $v_k$ 串行的计算形式转为并行计算，并且这是一个前缀和（Prefix Sum）计算问题，即求（给定初值 $s_0$ 和 各个 $e_k$ ）
+
+$$
+\begin{aligned}
+&v_1 = [s_0 \oplus e_1]_2 \\
+&v_2 = [s_0 \oplus e_1 \oplus e_2]_2 \\
+&\cdots \\
+&v_k = [s_0 \oplus e_1 \oplus \cdots \oplus e_k]_2
+\end{aligned}
+\tag{12}
+$$
+
+其中 $[x]_2$ 为取向量 $x$ 的第2个元素。并且CUDA中已有高效的并行前缀和计算实现[BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan)，包含在[CUB](https://nvidia.github.io/cccl/cub/index.html)库中。
+
+## 并行前缀和计算过程
+
+前缀和的并行计算可以充分利用广义求和算子（例如上述的 $\oplus$ 算子）结合律性质，改变求和顺序来高效并行计算，最终如下所示：
+
+![前缀和示意图](figures/prefix-sum.png)
+
+图中每一行为一次循环过程，对于第 $i$ 次循环，第 $j$ 个CUDA线程从第 $j + 2^i$ 个地址上取出对应的数值并加到其对应的第 $j$ 个地址上，具体参考高效并行编程《Programming Massively Parallel Processors: A Hands-on Approach》第十一章对前缀和的描述以及[BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan)的前缀和函数介绍。
+
+
+
+# CUDA代码分析
+
+待续。。。
 
 ## 参考文献
 
