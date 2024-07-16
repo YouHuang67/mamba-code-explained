@@ -162,10 +162,10 @@ $$
 \oplus
 \left[ \begin{array}{c}
 	a_k\\
-	b_ku_{k}^{i}\\
+	c_k\\
 \end{array} \right] &=\left[ \begin{array}{c}
-	a_k\cdot a_{k-1}\\
-	a_k\cdot v_{k-1}+b_ku_{k}^{i}\\
+	a_{k\ldots k-1}\\
+	a_k\cdot v_{k-1}+ c_k\\
 \end{array} \right]\\
 \end{aligned}
 \tag{8}
