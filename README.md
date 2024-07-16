@@ -171,6 +171,76 @@ $$
 \tag{8}
 $$
 
+不难证明这个算子 $\oplus $ 满足结合律：
+
+$$
+\begin{aligned}
+	& \left( \left[ \begin{array}{c}
+	a_{k-2}\\
+	v_{k-2}\\
+\end{array} \right] \oplus
+\left[ \begin{array}{c}
+	a_{k-1}\\
+	c_{k-1}\\
+\end{array} \right] \right) \oplus \left[ \begin{array}{c}
+	a_k\\
+	c_k\\
+\end{array} \right] = \left[ \begin{array}{c}
+	a_{k-1} a_{k-2}\\
+	a_{k-1} v_{k-2} + c_{k-1}\\
+\end{array} \right] \oplus \left[ \begin{array}{c}
+	a_k\\
+	c_k\\
+\end{array} \right] 
+	=\left[ \begin{array}{c}
+	a_{k} a_{k-1} a_{k-2}\\
+	a_k (a_{k-1} v_{k-2}+c_{k-1})+c_k \\
+\end{array} \right]\\
+
+& \left[ \begin{array}{c}
+	a_{k-2}\\
+	v_{k-2}\\
+\end{array} \right] \oplus \left( \left[ \begin{array}{c}
+	a_{k-1}\\
+	c_{k-1}\\
+\end{array} \right] \oplus \left[ \begin{array}{c}
+	a_k\\
+	c_k\\
+\end{array} \right] \right) =  \left[ \begin{array}{c}
+	a_{k-2}\\
+	v_{k-2}\\
+\end{array} \right] \oplus \left[ \begin{array}{c}
+	a_{k} a_{k-1}\\
+	a_k c_{k-1} + c_k\\
+\end{array} \right] 
+	=\left[ \begin{array}{c}
+	a_{k} a_{k-1} a_{k-2}\\
+	(a_k a_{k-1}) v_{k-2}+(a_k c_{k-1} + c_k)\\
+\end{array} \right]\\
+
+& \implies \left( \left[ \begin{array}{c}
+	a_{k-2}\\
+	v_{k-2}\\
+\end{array} \right] \oplus
+\left[ \begin{array}{c}
+	a_{k-1}\\
+	c_{k-1}\\
+\end{array} \right] \right) \oplus \left[ \begin{array}{c}
+	a_k\\
+	c_k\\
+\end{array} \right] = \left[ \begin{array}{c}
+	a_{k-2}\\
+	v_{k-2}\\
+\end{array} \right] \oplus \left( \left[ \begin{array}{c}
+	a_{k-1}\\
+	c_{k-1}\\
+\end{array} \right] \oplus \left[ \begin{array}{c}
+	a_k\\
+	c_k\\
+\end{array} \right] \right)
+\end{aligned}
+$$
+
 
 ## 参考文献
 
