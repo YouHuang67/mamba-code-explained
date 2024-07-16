@@ -1,6 +1,6 @@
 [English Version](README.en.md)
 
-# Mamba CUDA 代码解析
+# Mamba CUDA 实现解析
 
 ## SSM基本形式
 
@@ -125,6 +125,7 @@ $$
 ## Mamba SSM并行计算
 
 对公式（7）展开，则构成以下形式
+
 $$
 \begin{aligned}
 	v_k&=a_kv_{k-1}+b_ku_{k}^{i}\\
