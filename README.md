@@ -33,7 +33,7 @@ $$
 
 ## 参考文献
 
-**[1] Gu, Albert, and Tri Dao. Mamba: Linear-time sequence modeling with selective state spaces. **
+**[1] Gu, Albert, and Tri Dao. Mamba: Linear-time sequence modeling with selective state spaces.**
 
 
 
