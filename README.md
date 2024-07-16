@@ -35,7 +35,7 @@ $$
 \end{equation}
 $$
 
-这里引入了时间步长 $\Delta = t_k - t_{k - 1} \in \mathbb{R}^{1}$ ，其中 $t_k, t_{k - 1}$ 为离散化时用于采样的时刻， $ A \in \mathbb{R}^{N\times N},B \in \mathbb{R}^{N \times D}$ 同上， $I$ 为单位矩阵（ **为简化后续理解，这里和下文都忽略 $y(t) $ 的部分** ）。
+这里引入了时间步长 $\Delta = t_k - t_{k - 1} \in \mathbb{R}^{1}$ ，其中 $t_k, t_{k - 1}$ 为离散化时用于采样的时刻， $A \in \mathbb{R}^{N\times N},B \in \mathbb{R}^{N \times D}$ 同上， $I$ 为单位矩阵（ **为简化后续理解，这里和下文都忽略 $y(t)$ 的部分** ）。
 
 
 
@@ -46,9 +46,9 @@ $$
 $$
 \begin{equation}
 \begin{aligned}
-	x_k&=\bar{A}_kx_{k-1}+\bar{B}_ku_k\\
-	\bar{A}_k&=e^{\Delta _kA}\\
-	\bar{B}_k&=A^{-1}(e^{\Delta _kA}-I)B_k\\
+	x_k&=\bar{A_k} x_{k-1}+\bar{B_k}u_k\\
+	\bar{A_k}&=e^{\Delta_k A}\\
+	\bar{B_k}&=A^{-1}(e^{\Delta_k A}-I)B_k\\
 \end{aligned}
 \tag{3}
 \end{equation}
