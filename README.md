@@ -4,8 +4,9 @@
 
 ## SSM基本形式
 
-这篇文章将对《**Mamba: Linear-time sequence modeling with selective state spaces**》中Mamba模型[1]的CUDA代码进行分析和推导，尝试解释下Mamba为何计算高效。在了解代码之前，可以参考苏剑林博客[《重温SSM（一）：线性系统和HiPPO矩阵》](https://spaces.ac.cn/archives/10114)对Mamba理论的介绍，最终导出如下SSM（State Space Model）的基本形式：
+这篇文章将对《**Mamba: Linear-time sequence modeling with selective state spaces**》中Mamba模型[1]的CUDA代码进行分析和推导，尝试解释下Mamba为何计算高效。（ **虽然Mamba2已经中了ICML且通过高效的重构而让其实现主要依赖于Triton库（避免CUDA的优化问题），但最初的Mamba仍然具有很高的参考价值** ）
 
+在了解代码之前，可以参考苏剑林博客[《重温SSM（一）：线性系统和HiPPO矩阵》](https://spaces.ac.cn/archives/10114)对Mamba理论的介绍，最终导出如下SSM（State Space Model）的基本形式：
 $$
 \begin{equation}
 \begin{aligned}
