@@ -64,27 +64,61 @@ $$
 
 ## Mamba SSM简化
 
-Mamba在实现上对SSM进行两个层面的简化，首先对于多通道的 $\bar{B_k}$ ，其每个通道在实际计算时完全独立处理，这样大幅度降低计算量的同时也便于GPU的并行计算。因此，以下用 $\bar{B_k^i} \in \mathbb{R}^1$ 指代 $\bar{B_k}$ 的第 $i$ 个通道，并且由于通道间的独立性，公式（3）简化为单通道的独立计算，针对 $\bar{B_k^i}$ ，有以下形式：
+Mamba在实现上对SSM进行两个层面的简化，首先对于多通道的 $\bar{B_k}$ ，其每个通道在实际计算时完全独立处理，这样大幅度降低计算量的同时也便于GPU的并行计算。因此，以下用 $u_k^i \in \mathbb{R}^1$ 指代 $u_k$ 的第 $i$ 个通道，并且由于通道间的独立性，公式（3）转化为单通道的独立计算，有以下形式：
 $$
 \begin{equation}
 \begin{aligned}
-	x_{k}^{i} &=\bar{A}_{k}^{i}x_{k-1}^{i}+\bar{B}_{k}^{i}u_{k}^{i}\,\,\in \,\,\mathbb{R} ^N\\
-	y_{k}^{i} &=C_kx_{k}^{i}+Du_{k}^{i}\,\,\in \,\,\mathbb{R} ^1\\
-	\bar{A}_{k}^{i} &=\mathrm{diag}\left( e^{\Delta _{k}^{i}A} \right) \in \mathbb{R} ^{N\times N} \\
-	\bar{B}_{k}^{i} &=\Delta _{k}^{i}\mu _{k}^{i}B_k\in \mathbb{R} ^{N\times 1}\\
+	x_{k}^{i} &=\bar{A_k^i}x_{k-1}^{i}+\bar{B_k^i}u_{k}^{i} \in \mathbb{R}^N
 \end{aligned}
 \tag{4}
 \end{equation}
 $$
 
+其中 $\bar{A_k^i}, \bar{B_k^i}$ 定义为
 
+$$
+\begin{equation}
+\begin{aligned}
+	\bar{A_k^i} &=\mathrm{diag}\left( e^{\Delta _{k}^{i}A} \right) \in \mathbb{R} ^{N\times N} \\
+	\bar{B_k^i} &=\Delta_{k}^{i}\mu _{k}^{i}B_k\in \mathbb{R} ^{N\times 1}\\
+\end{aligned}
+\tag{4}
+\end{equation}
+$$
 
+这里 $\text{diag}(x)$ 表示将其中的向量 $x$ 转为相应的对角矩阵，并在 $x$ 放置在对角线上，涉及到的所有变量具有以下形式：
 
+$$
+\begin{equation}
+\begin{aligned}
+u_{k}^{i}\in \mathbb{R}^1, x_{k}^{i}\in \mathbb{R}^N,\Delta _{k}^{i}\in \mathbb{R}^1, \mu _{k}^{i}\in \mathbb{R}^1 ,A\in \mathbb{R} ^N,B_k\in \mathbb{R} ^{N\times 1}
+\end{aligned}
+\end{equation}
+$$
 
+其中 $\Delta_{k}^{i}, \mu_k^i, B_k$ 由输入 $u_k$ 决定。
 
+因为公式（4）中的 $\bar{A_k^i}$ 为对角矩阵，所以其可以在 $x_k^i$ 的每个通道上进行独立计算，为简化形式，考虑 $x_k^i \in \mathbb{R}^N$ 的第 $j$ 个通道；相应地，定义变量 $a_k$ 为 $e^{\Delta _{k}^{i}A} \in \mathbb{R}^N$ 的第 $j$ 个元素；定义 $v_k$ 为 $x_k^i$ 的第 $j$ 个元素；定义 $b_k$ 为 $\bar{B_k^i}$ 的第 $j$ 个元素，即
 
+$$
+\begin{equation}
+\begin{aligned}
+a_k &= [e^{\Delta _{k}^{i}A}]_j \\
+v_k &= [x_k^i]_j \\
+b_k &= [\bar{B_k^i}]_j \\
+\end{aligned}
+\tag{5}
+\end{equation}
+$$
 
+因此，最终的核心迭代公式为：
 
+$$
+v_k=a_kv_{k-1}+b_ku_{k}^{i}
+\tag{6}
+$$
+
+对其展开，则构成以下形式
 
 $$
 \begin{aligned}
@@ -95,6 +129,12 @@ $$
 	&=a_ka_{k-1}\cdots a_1v_0+\sum_{j=1}^k{\left( \prod_{m=j+1}^k{a_m} \right)}b_ju_{j}^{i}\\
 \end{aligned}
 $$
+
+## Mamba SSM并行计算
+
+
+
+
 
 ## 参考文献
 
