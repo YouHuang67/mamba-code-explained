@@ -175,7 +175,7 @@ $$
 
 $$
 \begin{aligned}
-	& \left( \left[ \begin{array}{c}
+	& \left( \left[\begin{array}{c}
 	a_{k-2}\\
 	v_{k-2}\\
 \end{array} \right] \oplus
@@ -196,7 +196,6 @@ $$
 	a_{k} a_{k-1} a_{k-2}\\
 	a_k (a_{k-1} v_{k-2}+c_{k-1})+c_k \\
 \end{array} \right]\\
-
 & \left[ \begin{array}{c}
 	a_{k-2}\\
 	v_{k-2}\\
@@ -217,7 +216,6 @@ $$
 	a_{k} a_{k-1} a_{k-2}\\
 	(a_k a_{k-1}) v_{k-2}+(a_k c_{k-1} + c_k)\\
 \end{array} \right]\\
-
 & \implies \left( \left[ \begin{array}{c}
 	a_{k-2}\\
 	v_{k-2}\\
