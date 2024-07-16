@@ -42,6 +42,7 @@ $$
 ## Mamba SSM形式
 
 公式（2）为参数固定的SSM，但对于Mamba则采用依赖于输入变化的参数，即有以下形式：
+
 $$
 \begin{equation}
 \begin{aligned}
