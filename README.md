@@ -151,7 +151,26 @@ $$
 v_k = a_{k\ldots 0} + \sum_{j=1}^k a_{k\ldots j+1} c_j
 $$
 
-启发构造以下的算子（ **由Mamba CUDA代码反推** ）：
+启发构造以下的算子（ **由Mamba的CUDA代码反推** ）：
+
+$$
+\begin{aligned}
+	\left[ \begin{array}{c}
+	a_{k-1}\\
+	v_{k-1}\\
+\end{array} \right] 
+\oplus
+\left[ \begin{array}{c}
+	a_k\\
+	b_ku_{k}^{i}\\
+\end{array} \right] &=\left[ \begin{array}{c}
+	a_k\cdot a_{k-1}\\
+	a_k\cdot v_{k-1}+b_ku_{k}^{i}\\
+\end{array} \right]\\
+\end{aligned}
+\tag{8}
+$$
+
 
 ## 参考文献
 
