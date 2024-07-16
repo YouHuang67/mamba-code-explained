@@ -64,6 +64,18 @@ $$
 
 ## Mamba SSM简化
 
+Mamba在实现上对SSM进行两个层面的简化，首先对于多通道的 $\bar{B_k}$ ，其每个通道在实际计算时完全独立处理，这样大幅度降低计算量的同时也便于GPU的并行计算。因此，以下用 $\bar{B_k^i} \in \mathbb{R}^1$ 指代 $\bar{B_k}$ 的第 $i$ 个通道，并且由于通道间的独立性，公式（3）简化为单通道的独立计算，针对 $\bar{B_k^i}$ ，有以下形式：
+$$
+\begin{equation}
+\begin{aligned}
+	x_{k}^{i} &=\bar{A}_{k}^{i}x_{k-1}^{i}+\bar{B}_{k}^{i}u_{k}^{i}\,\,\in \,\,\mathbb{R} ^N\\
+	y_{k}^{i} &=C_kx_{k}^{i}+Du_{k}^{i}\,\,\in \,\,\mathbb{R} ^1\\
+	\bar{A}_{k}^{i} &=\mathrm{diag}\left( e^{\Delta _{k}^{i}A} \right) \in \mathbb{R} ^{N\times N} \\
+	\bar{B}_{k}^{i} &=\Delta _{k}^{i}\mu _{k}^{i}B_k\in \mathbb{R} ^{N\times 1}\\
+\end{aligned}
+\tag{4}
+\end{equation}
+$$
 
 
 
