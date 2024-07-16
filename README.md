@@ -16,7 +16,7 @@ $$
 \end{equation}
 $$
 
-物理含义： $u(t)$ 是用于记录一个时间段内信息的函数， $t$ 为连续的时间变量，即在任意时刻 $t=t_0$ ， $u(t_0)$ 描述了该时刻的信号，基于此构建上述微分方程（1）的第一行：引入隐藏状态变量 $x(t)$ ，并通过预定义矩阵的 $A,B$ 以及方程 $x'(t) = Ax(t) + Bu(t)$ 来建立 $x(t), u(t)$ 函数的联系（注意 $x^\prime(t)$ 是对 $t$ 求导）。公式（1）的第二行在确定 $x(t), u(t)$ 在相应时刻数值后由基本的线性计算给出 $y(t)$ ，因此不需要进一步讨论（**下文也只讨论对第一行的处理**）。总结：输入 $u(t)$ ，经过隐藏变量 $x(t)$ ，输出 $y(t)$ 。
+物理含义： $u(t) \in \mathbb{R}^{D}$ 是用于记录一个时间段内信息的函数， $t$ 为连续的时间变量，即在任意时刻 $t=t_0$ ， $u(t_0)$ 描述了该时刻的信号，基于此构建上述微分方程（1）的第一行：引入隐藏状态变量 $x(t) \in \mathbb{R}^{N}$ ，并通过预定义矩阵的 $A \in \mathbb{R}^{N\times N},B \in \mathbb{R}^{N \times D}$ 以及方程 $x'(t) = Ax(t) + Bu(t)$ 来建立 $x(t), u(t)$ 函数的联系（注意 $x^\prime(t)$ 是对 $t$ 求导）。公式（1）的第二行在确定 $x(t), u(t)$ 在相应时刻数值后由基本的线性计算给出 $y(t)$ ，因此不需要进一步讨论（**下文也只讨论对第一行的处理**）。总结：输入 $u(t)$ ，经过隐藏变量 $x(t)$ ，输出 $y(t)$ 。
 
 
 
@@ -28,13 +28,38 @@ $$
 \begin{equation}
 \begin{aligned}
 	x_k&=\bar{A}x_{k-1}+\bar{B}u_k\\
-	y_k&=Cx_k+Du_k\\
 	\bar{A}&=e^{\Delta A}\\
 	\bar{B}&=A^{-1}(e^{\Delta A}-I)B\\
 \end{aligned}
 \tag{2}
 \end{equation}
 $$
+
+这里引入了时间步长 $\Delta = t_k - t_{k - 1} \in \mathbb{R}^{1}$ ，其中 $t_k, t_{k - 1}$ 为离散化时用于采样的时刻， $ A \in \mathbb{R}^{N\times N},B \in \mathbb{R}^{N \times D}$ 同上， $I$ 为单位矩阵（ **为简化后续理解，这里和下文都忽略 $y(t) $ 的部分** ）。
+
+
+
+## Mamba SSM形式
+
+公式（2）为参数固定的SSM，但对于Mamba则采用依赖于输入变化的参数，即有以下形式：
+$$
+\begin{equation}
+\begin{aligned}
+	x_k&=\bar{A}_kx_{k-1}+\bar{B}_ku_k\\
+	\bar{A}_k&=e^{\Delta _kA}\\
+	\bar{B}_k&=A^{-1}(e^{\Delta _kA}-I)B_k\\
+\end{aligned}
+\tag{3}
+\end{equation}
+$$
+
+其中 $\Delta_k = \Delta_k(u_k) \in \mathbb{R}^{1}, B_k = B_k(u_k) \mathbb{R}^{N\times D}$ 均根据输入 $u(k)$ 决定，例如可以直接由简单线性映射 $\text{Linear}(u_k)$ 获得。
+
+
+
+
+
+
 
 
 
