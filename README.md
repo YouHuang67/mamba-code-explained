@@ -88,7 +88,7 @@ $$
 \end{equation}
 $$
 
-这里 $\text{diag}(x)$ 表示将其中的向量 $x$ 转为相应的对角矩阵，并在 $x$ 放置在对角线上，涉及到的所有变量具有以下形式：
+这里 $\text{diag}(x)$ 表示将其中的向量 $x$ 转为相应的对角矩阵，并将 $x$ 放置在对角线上，涉及到的所有变量具有以下形式：
 
 $$
 \begin{equation}
@@ -98,29 +98,29 @@ u_{k}^{i}\in \mathbb{R}^1, x_{k}^{i}\in \mathbb{R}^N,\Delta _{k}^{i}\in \mathbb{
 \end{equation}
 $$
 
-其中 $\Delta_{k}^{i}, \mu_k^i, B_k$ 由输入 $u_k$ 决定。
+其中 $\Delta_{k}^{i}, \mu_k^i, B_k$ 由输入 $u_k$ 决定，这里的 $A$ 由原本的 $N \times N$ 矩阵简化为 $N$ 维向量。
 
-因为公式（4）中的 $\bar{A_k^i}$ 为对角矩阵，所以其可以在 $x_k^i$ 的每个通道上进行独立计算，为简化形式，考虑 $x_k^i \in \mathbb{R}^N$ 的第 $j$ 个通道；相应地，定义变量 $a_k$ 为 $e^{\Delta _{k}^{i}A} \in \mathbb{R}^N$ 的第 $j$ 个元素；定义 $v_k$ 为 $x_k^i$ 的第 $j$ 个元素；定义 $b_k$ 为 $\bar{B_k^i}$ 的第 $j$ 个元素，即
+在第二层面的简化，因为公式（4）中的 $\bar{A_k^i}$ 为对角矩阵，所以其可以在 $x_k^i$ 的每个通道上进行独立计算。考虑 $x_k^i \in \mathbb{R}^N$ 的第 $j$ 个通道，定义 $v_k$ 为 $x_k^i$ 的第 $j$ 个元素，相应定义变量 $a_k$ 为 $e^{\Delta _{k}^{i}A} \in \mathbb{R}^N$ 的第 $j$ 个元素，定义 $b_k$ 为 $\bar{B_k^i}$ 的第 $j$ 个元素，即
 
 $$
 \begin{equation}
 \begin{aligned}
-a_k &= [e^{\Delta _{k}^{i}A}]_j \\
 v_k &= [x_k^i]_j \\
+a_k &= [e^{\Delta _{k}^{i}A}]_j \\
 b_k &= [\bar{B_k^i}]_j \\
 \end{aligned}
 \tag{6}
 \end{equation}
 $$
 
-因此，最终的核心迭代公式为：
+因此，最终的核心迭代公式为（对 $x_k^i$ 所有通道均成立）：
 
 $$
-v_k=a_kv_{k-1}+b_ku_{k}^{i}
+v_k=a_kv_{k-1}+b_ku_{k}^{i} \in \mathbb{R}^1
 \tag{7}
 $$
 
-为计算所有的 $v_0, v_1, \ldots, v_L$ 从而实现SSM，最直接的方式就是从初始值 $v_0$ 开始迭代，利用公式（7）串行的循环计算，但这样计算效率不高，由此引出以下的并行计算过程。
+为计算所有的 $v_0, v_1, \ldots, v_L$ 从而实现SSM，最直接的方式就是从初始值 $v_0$ 开始迭代，利用公式（7）串行循环计算，但这样计算效率不高，由此引出以下的并行计算过程。
 
 ## Mamba SSM并行计算
 
