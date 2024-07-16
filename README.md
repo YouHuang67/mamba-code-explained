@@ -80,10 +80,10 @@ $$
 $$
 \begin{equation}
 \begin{aligned}
-	\bar{A_k^i} &=\mathrm{diag}\left( e^{\Delta _{k}^{i}A} \right) \in \mathbb{R} ^{N\times N} \\
+	\bar{A_k^i} &=\text{diag} ( e^{\Delta_k^i A} ) \in \mathbb{R} ^{N\times N} \\
 	\bar{B_k^i} &=\Delta_{k}^{i}\mu _{k}^{i}B_k\in \mathbb{R} ^{N\times 1}\\
 \end{aligned}
-\tag{4}
+\tag{5}
 \end{equation}
 $$
 
@@ -108,7 +108,7 @@ a_k &= [e^{\Delta _{k}^{i}A}]_j \\
 v_k &= [x_k^i]_j \\
 b_k &= [\bar{B_k^i}]_j \\
 \end{aligned}
-\tag{5}
+\tag{6}
 \end{equation}
 $$
 
