@@ -164,8 +164,8 @@ $$
 	a_k\\
 	c_k\\
 \end{array} \right] &=\left[ \begin{array}{c}
-	a_{k\ldots k-1}\\
-	a_k\cdot v_{k-1}+ c_k\\
+	a_{k} a_{k-1}\\
+	a_k v_{k-1}+ c_k\\
 \end{array} \right]\\
 \end{aligned}
 \tag{8}
