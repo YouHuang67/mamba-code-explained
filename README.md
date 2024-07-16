@@ -28,6 +28,7 @@ $$
 \begin{equation}
 \begin{aligned}
 	x_k&=\bar{A}x_{k-1}+\bar{B}u_k\\
+	y_k&=Cx_k + Du_k \\
 	\bar{A}&=e^{\Delta A}\\
 	\bar{B}&=A^{-1}(e^{\Delta A}-I)B\\
 \end{aligned}
@@ -35,7 +36,9 @@ $$
 \end{equation}
 $$
 
-这里引入了时间步长 $\Delta = t_k - t_{k - 1} \in \mathbb{R}^{1}$ ，其中 $t_k, t_{k - 1}$ 为离散化时用于采样的时刻， $A \in \mathbb{R}^{N\times N},B \in \mathbb{R}^{N \times D}$ 同上， $I$ 为单位矩阵（ **为简化后续理解，这里和下文都忽略 $y(t)$ 的部分** ）。
+这里引入了时间步长 $\Delta = t_k - t_{k - 1} \in \mathbb{R}^{1}$ ，其中 $t_k, t_{k - 1}$ 为离散化时用于采样的时刻， $A \in \mathbb{R}^{N\times N},B \in \mathbb{R}^{N \times D}$ 同上， $I$ 为单位矩阵
+
+直观理解： $u_k$ 可以对应于自然语言中的token，即给定一个长度为 $L$ 的token序列， $\{u_k\}_{k=1}^L$ ，SSM先通过公式（2）的迭代形式将这个序列映射为对应每个token的隐藏状态 $x_k$ ，后再线性映射为输出 $y_k$ 。（ **为便于后续分析，下文忽略 $y_k$ 的部分，其只是 $x_k, u_k$ 的简单线性组合** ）。
 
 
 
@@ -54,7 +57,7 @@ $$
 \end{equation}
 $$
 
-其中 $\Delta_k = \Delta_k(u_k) \in \mathbb{R}^{1}, B_k = B_k(u_k) \mathbb{R}^{N\times D}$ 均根据输入 $u(k)$ 决定，例如可以直接由简单线性映射 $\text{Linear}(u_k)$ 获得。
+其中 $\Delta_k = \Delta_k(u_k) \in \mathbb{R}^{1}, B_k = B_k(u_k) \in \mathbb{R}^{N\times D}$ 根据输入 $u_k$ 决定，例如可以由简单线性映射 $\text{Linear}(u_k)$ 生成[1]。
 
 
 
