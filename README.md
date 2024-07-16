@@ -129,13 +129,27 @@ $$
 	&\vdots\\
 	&=a_ka_{k-1}\cdots a_1v_0+\sum_{j=1}^k{\left( \prod_{m=j+1}^k{a_m} \right)}b_ju_{j}^{i}\\
 \end{aligned}
+\tag{7}
 $$
 
 ## Mamba SSM并行计算
 
+公式（7）虽然复杂，但实际上主要有三个类型的变量，包括 
 
+$$
+\begin{aligned}
+&a_{m\ldots n} = a_m a_{m-1} \ldots a_n, \\
+&v_k, \\
+&c_j = b_ju_j^i \\
+\end{aligned}
+$$
 
+公式（7）简化为
+$$
+v_k = a_{k\ldots 0} + \sum_{j=1}^k a_{k\ldots j+1} c_j
+$$
 
+启发构造以下的算子（ **由Mamba CUDA代码反推** ）：
 
 ## 参考文献
 
