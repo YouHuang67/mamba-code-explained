@@ -316,7 +316,7 @@ $$
 
 ![前缀和示意图](figures/prefix-sum.png)
 
-图中每一行为一次循环过程，对于第 $i$ 次循环，第 $j$ 个CUDA线程从第 $j + 2^{i-1}$ 个地址上取出对应的数值并加到其对应的第 $j$ 个地址上，具体参考高效并行编程《Programming Massively Parallel Processors: A Hands-on Approach》第十一章对前缀和的描述以及[BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan)的前缀和函数介绍。
+图中每一行为一次循环过程，对于第 $i$ 次循环，第 $j$ 个CUDA线程从第 $j$ 个地址上取出对应的数值并加到第 $j + 2^{i-1}$ 个地址上，具体参考高效并行编程《Programming Massively Parallel Processors: A Hands-on Approach》第十一章对前缀和的描述以及[BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan)的前缀和函数介绍。
 
 
 
