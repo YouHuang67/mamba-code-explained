@@ -18,27 +18,27 @@ $$
 \end{equation}
 $$
 
-Physical meaning: $u(t) \in \mathbb{R}^{D}$ is a function used to record information over a period of time, where $t$ is a continuous time variable, i.e., at any moment $t=t_0$, $u(t_0)$ describes the signal at that moment. Based on this, the first line of differential equation (1) introduces the hidden state variable $x(t) \in \mathbb{R}^{N}$, and establishes the relationship between $x(t)$ and $u(t)$ through the predefined matrices $A \in \mathbb{R}^{N\times N}, B \in \mathbb{R}^{N \times D}$ and the equation $x'(t) = Ax(t) + Bu(t)$ (note that $x^\prime(t)$ is the derivative with respect to $t$). The second line of Equation (1) gives $y(t)$ after determining the values of $x(t)$ and $u(t)$, hence no further discussion is needed (**subsequent discussion will only focus on the first line**). In summary: Input $u(t)$, through the hidden variable $x(t)$, outputs $y(t)$.
+Intuitive explanation: $u(t) \in \mathbb{R}^{D}$ is a function used to record information over a period of time, where $t$ is a continuous time variable, i.e., at any moment $t=t_0$, $u(t_0)$ describes the signal at that moment. Based on this, the first line of differential equation (1) introduces the hidden state variable $x(t) \in \mathbb{R}^{N}$, and establishes the relationship between $x(t)$ and $u(t)$ through the predefined matrices $A \in \mathbb{R}^{N\times N}, B \in \mathbb{R}^{N \times D}$ and the equation $x'(t) = Ax(t) + Bu(t)$ (note that $x^\prime(t)$ is the derivative with respect to $t$). The second line of Equation (1) gives $y(t)$ after determining the values of $x(t)$ and $u(t)$, hence no further discussion is needed (**subsequent discussion will only focus on the first line**). In summary: Input $u(t)$, through the hidden variable $x(t)$, outputs $y(t)$.
 
 ## Discretization of SSM
 
-The above form of SSM is for continuous variable $ t $, but is not applicable for practical computation, hence needs discretization. This part is referred from ["SSM Discretization Derivation"](https://zhuanlan.zhihu.com/p/680534665), and finally obtaining the following computable iterative form:
+The above form of SSM pertains to the continuous variable $t$, but it cannot be applied directly in practical computations, thus necessitating discretization. This section references ["SSM Discretization Derivation" (In Chinese)](https://zhuanlan.zhihu.com/p/680534665) to obtain the following computable iterative form:
 
 $$
 \begin{equation}
 \begin{aligned}
-	x_k &= \bar{A}x_{k-1} + \bar{B}u_k \\
-	y_k &= Cx_k + Du_k \\
-	\bar{A} &= e^{\Delta A} \\
-	\bar{B} &= A^{-1}(e^{\Delta A}-I)B \\
+    x_k &= \bar{A}x_{k-1} + \bar{B}u_k \\
+    y_k &= Cx_k + Du_k \\
+    \bar{A} &= e^{\Delta A} \\
+    \bar{B} &= A^{-1}(e^{\Delta A}-I)B \\
 \end{aligned}
 \tag{2}
 \end{equation}
 $$
 
-Here, $ \Delta = t_k - t_{k - 1} \in \mathbb{R}^{1} $, where $ t_k, t_{k - 1} $ are the moments used for sampling during discretization, $ A \in \mathbb{R}^{N\times N}, B \in \mathbb{R}^{N \times D} $ as above, $ I $ is the identity matrix.
+Here, the time step $\Delta = t_k - t_{k - 1} \in \mathbb{R}^{1}$ is introduced, where $t_k, t_{k - 1}$ are the moments used for sampling during discretization, $A \in \mathbb{R}^{N\times N}, B \in \mathbb{R}^{N \times D}$ as above, and $I$ is the identity matrix.
 
-Intuitive understanding: $ u_k $ can correspond to a token in natural language, i.e., given a sequence of length $ L $ with $ D $ channels of tokens $ u_1, u_2, \ldots, u_L \in \mathbb{R}^{D} $, SSM first maps this sequence through the iterative form of formula (2) to the hidden states corresponding to each token $ x_k \in \mathbb{R}^{N} $, and then linearly maps to the output $ y_k $. (**For ease of subsequent analysis, the part about $ y_k $ is omitted, as it is just a simple linear combination of $ x_k, u_k $**).
+Intuitive explanation: $u_k$ can correspond to a token in natural language, i.e., given a sequence of length $L$ with $D$ channels of tokens $u_1, u_2, \ldots, u_L \in \mathbb{R}^{D}$, SSM first maps this sequence through the iteration defined in Equation (2) to the hidden states corresponding to each token $x_k \in \mathbb{R}^{N}$, and then linearly maps to the output $y_k$. (**To simplify subsequent analysis, the part about $y_k$ is omitted here, as it is merely a simple linear combination of $x_k, u_k$**).
 
 ## Mamba SSM Form
 
