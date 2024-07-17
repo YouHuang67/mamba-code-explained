@@ -99,9 +99,9 @@ On the second level of simplification, since $\bar{A_k^i}$ forms a diagonal matr
 $$
 \begin{equation}
 \begin{aligned}
-v_k &= [x_k^i]_j \\
-a_k &= [e^{\Delta _{k}^{i}A}]_j \\
-b_k &= [\bar{B_k^i}]_j \\
+v_k &= [x_k^i]_j, \\
+a_k &= [e^{\Delta _{k}^{i}A}]_j, \\
+b_k &= [\bar{B_k^i}]_j. \\
 \end{aligned}
 \tag{6}
 \end{equation}
@@ -110,15 +110,15 @@ $$
 Therefore, the core iterative formula (per channel of $x_k^i$) is:
 
 $$
-v_k = a_k v_{k-1} + b_k u_{k}^{i} \in \mathbb{R}^1
+v_k = a_k v_{k-1} + b_k u_{k}^{i} \in \mathbb{R}^1.
 \tag{7}
 $$
 
 The most direct way to compute all $v_0, v_1, \ldots, v_L$ and thus implement SSM is to start from the initial value $v_0$ and iteratively apply Equation (7) in a serial loop, but this method is not efficient, hence the following parallel computation process is introduced.
 
-## Mamba SSM Parallel Computation
+## Parallel Computation of Mamba SSM
 
-Expanding formula (7) yields the following form:
+Expanding Equation (7) yields the following form:
 
 $$
 \begin{aligned}
@@ -126,183 +126,193 @@ $$
     &= a_k (a_{k-1} v_{k-2} + b_{k-1} u_{k-1}^{i}) + b_k u_{k}^{i} \\
     &= a_k a_{k-1} v_{k-2} + a_k b_{k-1} u_{k-1}^{i} + b_k u_{k}^{i} \\
     &\vdots \\
-    &= a_k a_{k-1} \cdots a_1 v_0 + \sum_{j=1}^k{\left( \prod_{m=j+1}^k{a_m} \right)} b_j u_{j}^{i} \\
+    &= a_k a_{k-1} \cdots a_1 v_0 + \sum_{j=1}^k {\left( \prod_{m=j+1}^k{a_m} \right)} b_j u_{j}^{i}. \\
 \end{aligned}
 \tag{8}
 $$
 
-Although complex, formula (8) essentially involves three types of variables: $ a_{m\ldots n} = a_m a_{m-1} \ldots a_n $, $ v_k $, and $ c_j = b_j u_j^i $. Simplifying, the formula becomes:
+Although Equation (8) appears complex, it primarily involves three types of variables:
 
 $$
-v_k = a_{k\ldots 0} v_0 + \sum_{j=1}^k a_{k\ldots j+1} c_j
+\begin{aligned}
+    &a_{m\ldots n} = a_m a_{m-1} \ldots a_n, \\
+    &v_k, \\
+    &c_j = b_j u_j^i. \\
+\end{aligned}
+$$
+
+Thus, Equation (8) simplifies to:
+
+$$
+v_k = a_{k\ldots 0} v_0 + \sum_{j=1}^k a_{k\ldots j+1} c_j.
 \tag{9}
 $$
 
-This inspires the construction of the following operator ( **inferred from Mamba's CUDA code** ):
+This leads to the construction of the following operator (**inferred from Mamba's CUDA code**):
 
 $$
 \begin{aligned}
     \left[ \begin{array}{c}
     a_{k-1} \\
     v_{k-1} \\
-\end{array} \right] 
-\oplus
-\left[ \begin{array}{c}
+    \end{array} \right] 
+    \oplus
+    \left[ \begin{array}{c}
     a_k \\
     c_k \\
-\end{array} \right] &= \left[ \begin{array}{c}
+    \end{array} \right] &= \left[ \begin{array}{c}
     a_k a_{k-1} \\
     a_k v_{k-1} + c_k \\
-\end{array} \right] \\
+    \end{array} \right] \\
 \end{aligned}
 \tag{10}
 $$
 
-It is not difficult to prove that this operator $ \oplus $ is associative:
+It is trivial to demonstrate that this operator $\oplus$ satisfies the associative law:
 
 $$
-\begin{aligned
+\begin{aligned}
     & \left( \left[\begin{array}{c}
     a_{k-2} \\
     v_{k-2} \\
-\end{array} \right] \oplus
-\left[ \begin{array}{c}
+    \end{array} \right] \oplus
+    \left[ \begin{array}{c}
     a_{k-1} \\
     c_{k-1} \\
-\end{array} \right] \right) \oplus \left[ \begin{array}{c}
+    \end{array} \right] \right) \oplus \left[ \begin{array}{c}
     a_k \\
     c_k \\
-\end{array} \right] = \left[ \begin{array}{c}
+    \end{array} \right] = \left[ \begin{array}{c}
     a_{k-1} a_{k-2} \\
     a_{k-1} v_{k-2} + c_{k-1} \\
-\end{array} \right] \oplus \left[ \begin{array}{c}
+    \end{array} \right] \oplus \left[ \begin{array}{c}
     a_k \\
     c_k \\
-\end{array} \right]
+    \end{array} \right]
     = \left[ \begin{array}{c}
     a_k a_{k-1} a_{k-2} \\
     a_k (a_{k-1} v_{k-2} + c_{k-1}) + c_k \\
-\end{array} \right] \\
-& \left[ \begin{array}{c}
+    \end{array} \right], \\
+    & \left[ \begin{array}{c}
     a_{k-2} \\
     v_{k-2} \\
-\end{array} \right] \oplus \left( \left[ \begin{array}{c}
+    \end{array} \right] \oplus \left( \left[ \begin{array}{c}
     a_{k-1} \\
     c_{k-1} \\
-\end{array} \right] \oplus \left[ \begin{array}{c}
+    \end{array} \right] \oplus \left[ \begin{array}{c}
     a_k \\
     c_k \\
-\end{array} \right] \right) = \left[ \begin{array}{c}
+    \end{array} \right] \right) =  \left[ \begin{array}{c}
     a_{k-2} \\
     v_{k-2} \\
-\end{array} \right] \oplus \left[ \begin{array}{c
-
-
+    \end{array} \right] \oplus \left[ \begin{array}{c}
     a_k a_{k-1} \\
     a_k c_{k-1} + c_k \\
-\end{array} \right] 
+    \end{array} \right]
     = \left[ \begin{array}{c}
     a_k a_{k-1} a_{k-2} \\
     (a_k a_{k-1}) v_{k-2} + (a_k c_{k-1} + c_k) \\
-\end{array} \right] \\
-& \implies \left( \left[ \begin{array}{c}
+    \end{array} \right], \\
+    & \implies \left( \left[ \begin{array}{c}
     a_{k-2} \\
     v_{k-2} \\
-\end{array} \right] \oplus
-\left[ \begin{array}{c}
+    \end{array} \right] \oplus
+    \left[ \begin{array}{c}
     a_{k-1} \\
     c_{k-1} \\
-\end{array} \right] \right) \oplus \left[ \begin{array}{c}
+    \end{array} \right] \right) \oplus \left[ \begin{array}{c}
     a_k \\
     c_k \\
-\end{array} \right] = \left[ \begin{array}{c}
+    \end{array} \right] = \left[ \begin{array}{c}
     a_{k-2} \\
     v_{k-2} \\
-\end{array} \right] \oplus \left( \left[ \begin{array}{c}
+    \end{array} \right] \oplus \left( \left[ \begin{array}{c}
     a_{k-1} \\
     c_{k-1} \\
-\end{array} \right] \oplus \left[ \begin{array}{c}
+    \end{array} \right] \oplus \left[ \begin{array}{c}
     a_k \\
     c_k \\
-\end{array} \right] \right)
+    \end{array} \right] \right).
 \end{aligned}
 $$
 
-Further simplifying the notation, define:
+Further simplifying notation, define:
 
 $$
 \begin{aligned}
-& s_k=\left[ \begin{array}{c}
-    a_k\\
-    v_k\\
-\end{array} \right] 
-, e_k=\left[ \begin{array}{c}
-    a_k\\
-    c_k\\
-\end{array} \right] 
-\end{aligned}
+& s_k = \left[ \begin{array}{c}
+    a_k \\
+    v_k \\
+    \end{array} \right],
+& e_k = \left[ \begin{array}{c}
+    a_k \\
+    c_k \\
+    \end{array} \right]
+\end{aligned}.
 $$
 
-And according to formula (7), the recursive process follows:
+And according to Equation (7), the recursive process follows:
 
 $$
 \begin{aligned}
-    &s_{k-1}\oplus e_k=\left[ \begin{array}{c}
-    a_k a_{k-1}\\
-    a_k v_{k-1} + c_k\\
-\end{array} \right] =\left[ \begin{array}{c}
-    a_k a_{k-1}\\
-    v_k\\
-\end{array} \right]\\
-    &s_{k-2}\oplus e_{k-1}\oplus e_k=\left[ \begin{array}{c}
-    a_{k-1} a_{k-2}\\
-    v_{k-1}\\
-\end{array} \right] \oplus e_k=\left[ \begin{array}{c}
-    a_k a_{k-1} a_{k-2}\\
-    v_k\\
-\end{array} \right]\\
-    &\vdots\\
-    &s_0\oplus e_1\oplus \cdots \oplus e_k=\left[ \begin{array}{c}
-    a_k a_{k-1}\cdots a_0\\
-    v_k\\
-\end{array} \right]\\
+    &s_{k-1} \oplus e_k = \left[ \begin{array}{c}
+    a_k a_{k-1} \\
+    a_k v_{k-1} + c_k \\
+    \end{array} \right] = \left[ \begin{array}{c}
+    a_k a_{k-1} \\
+    v_k \\
+    \end{array} \right], \\
+    &s_{k-2} \oplus e_{k-1} \oplus e_k = \left[ \begin{array}{c}
+    a_{k-1} a_{k-2} \\
+    v_{k-1} \\
+    \end{array} \right] \oplus e_k = \left[ \begin{array}{c}
+    a_k a_{k-1} a_{k-2} \\
+    v_k \\
+    \end{array} \right], \\
+    &\vdots \\
+    &s_0 \oplus e_1 \oplus \cdots \oplus e_k = \left[ \begin{array}{c}
+    a_k a_{k-1}\cdots a_0 \\
+    v_k \\
+    \end{array} \right]. \\
 \end{aligned}
 $$
 
-By the associative property of the operator $ \oplus $, it follows:
+By the associative property of the operator $\oplus$, it can be seen:
 
 $$
 \begin{aligned}
     \left[ \begin{array}{c}
-    a_k a_{k-1}\cdots a_0\\
-    v_k\\
-\end{array} \right] &=\left( \cdots \left( \left( s_0\oplus e_1 \right) \oplus e_2 \right) \cdots \oplus e_k \right)\\
-    &=s_0\oplus \left( e_1\oplus \cdots \oplus e_k \right) \oplus \left( e_{k+1}\oplus \cdots \oplus e_n \right)\\
+    a_k a_{k-1}\cdots a_0 \\
+    v_k \\
+    \end{array} \right] &= \left( \cdots \left( \left( s_0 \oplus e_1 \right) \oplus e_2 \right) \cdots \oplus e_k \right) \\
+    &= s_0 \oplus \left( e_1 \oplus \cdots \oplus e_k \right) \oplus \left( e_{n+1} \oplus \cdots \oplus e_k \right). \\
 \end{aligned}
 \tag{11}
 $$
 
-This means that the originally serial computation of $ v_k $ can be transformed into a parallel computation, which is essentially a prefix sum computation problem. To compute:
+This means that the originally serial computation of $v_k$ can be transformed into parallel computation, and this constitutes a Prefix Sum computation issue, that is, seeking (given the initial value $s_0$ and each $e_k$):
 
 $$
 \begin{aligned}
-&v_1 = [s_0 \oplus e_1]_2 \\
-&v_2 = [s_0 \oplus e_1 \oplus e_2]_2 \\
-&\cdots \\
-&v_k = [s_0 \oplus e_1 \oplus \cdots \oplus e_k]_2
+&v_1 = [s_0 \oplus e_1]_2, \\
+&v_2 = [s_0 \oplus e_1 \oplus e_2]_2, \\
+&\vdots \\
+&v_k = [s_0 \oplus e_1 \oplus \cdots \oplus e_k]_2.
 \end{aligned}
 \tag{12}
 $$
 
-Where $ [x]_2 $ is the second element of vector $ x $. CUDA has efficient parallel prefix sum implementations available in libraries such as [BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html) included in the [CUB](https://nvidia.github.io/cccl/cub/index.html) library.
+Where $[x]_2$ denotes taking the second element of vector $x$. Moreover, CUDA already has efficient parallel prefix sum computation implementations like [BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan), included in the [CUB](https://nvidia.github.io/cccl/cub/index.html) library.
 
-## Parallel Prefix Sum Computation
 
-Parallel computation of prefix sums effectively utilizes the associative property of generalized sum operators (like the $ \oplus $ operator described) to change the order of summation for efficient parallel computation, as depicted:
+## Parallel Computation of Prefix Sum
+
+The parallel computation of prefix sums can fully utilize the associative property of generalized summation operators (i.e., the $\oplus$ operator mentioned above), changing the order of summation to achieve efficient parallel computation, as shown below:
 
 ![Prefix Sum Diagram](figures/prefix-sum.png)
 
-Each row in the diagram represents a loop iteration, where in the $ i $-th iteration, the $ j $-th CUDA thread fetches the corresponding value from the address $ j + 2^i $ and adds it to its corresponding address $ j $, as described in detail in the book "Programming Massively Parallel Processors: A Hands-on Approach" Chapter 11 on prefix sums and the [BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html) prefix sum function documentation.
+Each row in the diagram represents one loop iteration. During the $i$-th iteration, the $j$-th CUDA thread retrieves the corresponding value from the address $j + 2^{i-1}$ and adds it to its corresponding address $j$. For a detailed discussion on prefix sums and an introduction to the prefix sum function of [BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan), refer to Chapter 11 of "Programming Massively Parallel Processors: A Hands-on Approach".
+
 
 ## CUDA Code Analysis
 
