@@ -311,7 +311,7 @@ The parallel computation of prefix sums can fully utilize the associative proper
 
 ![Prefix Sum Diagram](figures/prefix-sum.png)
 
-Each row in the diagram represents one loop iteration. During the $i$-th iteration, the $j$-th CUDA thread retrieves the corresponding value from the address $j + 2^{i-1}$ and adds it to its corresponding address $j$. For a detailed discussion on prefix sums and an introduction to the prefix sum function of [BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan), refer to Chapter 11 of "Programming Massively Parallel Processors: A Hands-on Approach".
+Each row in the diagram represents one loop iteration. During the $i$-th iteration, the $j$-th CUDA thread retrieves the corresponding value from the address $j$ and adds it to the address $j + 2^{i-1}$. For a detailed discussion on prefix sums and an introduction to the prefix sum function of [BlockScan](https://nvidia.github.io/cccl/cub/api/classcub_1_1BlockScan.html#classcub_1_1blockscan), refer to Chapter 11 of "Programming Massively Parallel Processors: A Hands-on Approach".
 
 
 ## CUDA Code Analysis
