@@ -100,7 +100,7 @@ $$
 \begin{equation}
 \begin{aligned}
 v_k &= [x_k^i]_j \\
-a_k &= [e^{\Delta_{k}^{i}A}]_j \\
+a_k &= [e^{\Delta _{k}^{i}A}]_j \\
 b_k &= [\bar{B_k^i}]_j \\
 \end{aligned}
 \tag{6}
