@@ -144,8 +144,10 @@ Although Equation (8) appears complex, it primarily involves three types of vari
 Thus, Equation (8) simplifies to:
 
 ```math
+\begin{equation}
 v_k = a_{k\ldots 0} v_0 + \sum_{j=1}^k a_{k\ldots j+1} c_j.
 \tag{9}
+\end{equation}
 ```
 
 This leads to the construction of the following operator (**inferred from Mamba's CUDA code**):

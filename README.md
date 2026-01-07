@@ -150,8 +150,10 @@ v_k=a_kv_{k-1}+b_ku_{k}^{i} \in \mathbb{R}^1
 因此，公式（8）简化为
 
 ```math
+\begin{equation}
 v_k = a_{k\ldots 0} v_0 + \sum_{j=1}^k a_{k\ldots j+1} c_j
 \tag{9}
+\end{equation}
 ```
 
 由此启发构造以下算子（ **由Mamba的CUDA代码反推** ）：
