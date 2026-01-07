@@ -2,6 +2,8 @@
 
 # Mamba CUDA 实现解析
 
+> **提示**：如GitHub上公式显示异常，建议在支持MathJax的本地Markdown阅读器中查看。
+
 ## SSM基本形式
 
 这篇文章将对《**Mamba: Linear-time sequence modeling with selective state spaces**》中Mamba模型[1]的CUDA代码进行分析和推导，尝试解释下Mamba为何计算高效。（ **虽然Mamba2已经中了ICML且通过高效的重构而让其实现主要依赖于Triton库（避免CUDA的优化问题），但最初的Mamba仍然具有很高的参考价值** ）
@@ -150,10 +152,8 @@ v_k=a_kv_{k-1}+b_ku_{k}^{i} \in \mathbb{R}^1
 因此，公式（8）简化为
 
 ```math
-\begin{equation}
 v_k = a_{k\ldots 0} v_0 + \sum_{j=1}^k a_{k\ldots j+1} c_j
 \tag{9}
-\end{equation}
 ```
 
 由此启发构造以下算子（ **由Mamba的CUDA代码反推** ）：
